@@ -3,3 +3,5 @@
 	addu $4, $4, $2 #k = k+i
 	j Endif #goto Endif
 Else:
+	addu $4,$4,$3 # k = k+j
+Endif:
