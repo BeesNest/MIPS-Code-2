@@ -109,7 +109,18 @@ main:
     mult $s0, $t6
     mflo $s0
 
-    
+
     jal loop
+
+   	handle_space:
+    beq $zero, $s6, loop                        
+    jal print_invalid_value                     
+
+    
+    loop_exit:
+    li $v0, 1                                   
+    add $a0, $zero, $s1                         
+    syscall
+    jal exit
 
              
