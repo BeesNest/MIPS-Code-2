@@ -105,6 +105,11 @@ main:
     mflo $t3
     add $s1, $s1, $t3                           
 
+    li $t6, 36
+    mult $s0, $t6
+    mflo $s0
 
+    
+    jal loop
 
              
