@@ -68,6 +68,17 @@ main:
 
     li $a1, 10                                  
     beq $a1, $t2, loop
-                              
+
     li $s7, 32                                  
-    beq $t2, $s7, handle_space                  
+    beq $t2, $s7, handle_space     
+
+    li $s6, 1
+
+    li $t0, 47
+    slt $t1, $t0, $t2
+    slti $t4, $t2, 58
+    and $s5, $t1, $t4                           
+    addi $s3, $t2, -48                          
+    li $t7, 1
+    beq $t7, $s5, calculation                   
+             
