@@ -45,6 +45,13 @@ main:
     skip:
     addi $a0, $a0, 1
     jal filter_loop
-    
+
     exit_filter_loop:
     beqz $s2, print_empty
+
+    li $s0, 1                                   
+    li $s1, 0                                   
+    li $s4, 0                                   
+    li $s6, 0                                   
+    la $a0, filtered_input                      
+    addi $a0, $a0, 4                            
