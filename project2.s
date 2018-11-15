@@ -41,3 +41,10 @@ main:
     lb $t0, 3($a0)
     sb $t0, 3($a1)
     addi $a0, $a0, 3
+
+    skip:
+    addi $a0, $a0, 1
+    jal filter_loop
+    
+    exit_filter_loop:
+    beqz $s2, print_empty
