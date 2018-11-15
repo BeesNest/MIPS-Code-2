@@ -28,3 +28,16 @@ main:
     beq $t0, $t1, exit_filter_loop              
     beq $t0, $t2, skip                          
     beqz $t0, exit_filter_loop                  
+
+    bne $s2, $zero, print_more_than_four       
+    li $s2, 1                                   
+    la $a1, filtered_input                      
+    sb $t0, 0($a1)
+    lb $t0, 1($a0)
+    sb $t0, 1($a1)
+
+    lb $t0, 2($a0)
+    sb $t0, 2($a1)
+    lb $t0, 3($a0)
+    sb $t0, 3($a1)
+    addi $a0, $a0, 3
