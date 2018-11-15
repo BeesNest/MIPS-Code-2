@@ -8,8 +8,17 @@
     .asciiz "Invalid base-36 number."
     input_storage:
     .space 2000
-    filtered_input:                             # allocate 4 bytes for filtered out string that doesn't have white spaces
+    filtered_input:                             
     .space 4
 
 .text
 main:
+
+    la $a0, input_storage                       
+    li $v0, 8                                   
+    syscall
+
+ 
+    li $s2, 0                                   
+    li $t1, 10                                  
+    li $t2, 32
