@@ -134,3 +134,12 @@ main:
     li $v0, 4                                   
     syscall
     jal exit
+
+    print_more_than_four:
+    la $a0, input_too_long                      
+    li $v0, 4                                   
+    syscall
+
+    exit:
+    li $v0, 10                                  
+    syscall
