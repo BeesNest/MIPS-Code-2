@@ -123,4 +123,14 @@ main:
     syscall
     jal exit
 
-             
+    print_empty:
+    la $a0, input_is_empty                       
+    li $v0, 4                                   
+    syscall
+    jal exit
+
+    print_invalid_value:
+    la $a0, invalid_number                      
+    li $v0, 4                                   
+    syscall
+    jal exit
