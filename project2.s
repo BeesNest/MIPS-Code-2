@@ -22,3 +22,9 @@ main:
     li $s2, 0                                   
     li $t1, 10                                  
     li $t2, 32
+
+    filter_loop:
+    lb $t0, 0($a0)                              
+    beq $t0, $t1, exit_filter_loop              
+    beq $t0, $t2, skip                          
+    beqz $t0, exit_filter_loop                  
