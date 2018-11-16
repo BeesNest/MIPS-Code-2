@@ -1,145 +1,160 @@
 .data
-	#this is where define everuthing
-    input_too_long:
-    .asciiz "Input is too long."
-    input_is_empty:
-   .asciiz "Input is empty."
-    invalid_number:
-    .asciiz "Invalid base-36 number."
-    input_storage:
-    .space 2000
-    filtered_input:                             
-    .space 4
+    nullErrorMessage:	.asciiz "Input is empty."
+    lengthErrorMessage: .asciiz "Input is too long."
+    baseErrorMessage:   .asciiz "Invalid base-34 number."
+    userInput:		.space 50
+.text
+    main:
+	li $v0, 8       #Obtain user's input as text 
+	la $a0, userInput
+	li $a1, 50
+	syscall
+	
+	removeLeading:  #Remove leading spaces
+	li $t8, 32      #Save space character to t8
+	lb $t9, 0($a0)
+	beq $t8, $t9, removeFirst
+	move $t9, $a0
+	j checkLength
 
-.text 	#this is where we define the main and start dealing with logic 
-main:
+	removeFirst:
+	addi $a0, $a0, 1
+	j removeLeading
 
-    la $a0, input_storage                       
-    li $v0, 8                                   
-    syscall
+	checkLength:   
+	addi $t0, $t0, 0  
+	addi $t1, $t1, 10  
+	add $t4, $t4, $a0  
 
- 
-    li $s2, 0                                   
-    li $t1, 10                                  
-    li $t2, 32
+	lengthLoop:
+	lb $t2, 0($a0)   
+	beqz $t2, done   
+	beq $t2, $t1, done   
+	addi $a0, $a0, 1   
+	addi $t0, $t0, 1
+	j lengthLoop
 
-    filter_loop:  #this is the begining of the if statment and where we getn
-    lb $t0, 0($a0)                              
-    beq $t0, $t1, exit_filter_loop              
-    beq $t0, $t2, skip                          
-    beqz $t0, exit_filter_loop                  
+	done:
+	beqz $t0, nullError   
+	slti $t3, $t0, 5      
+	beqz $t3, lengthError 
+	move $a0, $t4
+	j checkString
 
-    bne $s2, $zero, print_more_than_four       
-    li $s2, 1                                   
-    la $a1, filtered_input                      
-    sb $t0, 0($a1)
-    lb $t0, 1($a0)
-    sb $t0, 1($a1)
+	nullError:
+	li $v0, 4
+	la $a0, nullErrorMessage
+	syscall
+	j exit
+	
+	lengthError:
+	li $v0, 4
+	la $a0, lengthErrorMessage
+	syscall
+	j exit
 
-    lb $t0, 2($a0)
-    sb $t0, 2($a1)
-    lb $t0, 3($a0)
-    sb $t0, 3($a1)
-    addi $a0, $a0, 3
+	checkString:
+	lb $t5, 0($a0)
+	beqz $t5, conversionInitializations  #End loop if null character is reached
+	beq $t5, $t1, conversionInitializations  #End loop if end-of-line character is detected
+	slti $t6, $t5, 48    
+	bne $t6, $zero, baseError
+	slti $t6, $t5, 58    
+	bne $t6, $zero, Increment
+	slti $t6, $t5, 65    
+	bne $t6, $zero, baseError
+	slti $t6, $t5, 89    
+	bne $t6, $zero, Increment
+	slti $t6, $t5, 97    
+	bne $t6, $zero, baseError
+	slti $t6, $t5, 121   
+	bne $t6, $zero, Increment
+	bgt $t5, 120, baseError   
 
-    skip:
-    addi $a0, $a0, 1
-    jal filter_loop
+	Increment:
+	addi $a0, $a0, 1
+	j checkString
 
-    exit_filter_loop:
-    beqz $s2, print_empty
+	baseError:
+	li $v0, 4
+	la $a0, baseErrorMessage
+	syscall
+	j exit
 
-    li $s0, 1                                   
-    li $s1, 0                                   
-    li $s4, 0                                   
-    li $s6, 0                                   
-    la $a0, filtered_input                      
-    addi $a0, $a0, 4     
+	conversionInitializations:
+	move $a0, $t4
+	addi $t7, $t7, 0  #Initialize decimal sum to zero
+	add $s0, $s0, $t0
+	addi $s0, $s0, -1	
+	li $s3, 3
+	li $s2, 2
+	li $s1, 1
+	li $s5, 0
 
-    loop:
+	convertString:
+	lb $s4, 0($a0)
+	beqz $s4, displaySum
+	beq $s4, $t1, displaySum
+	slti $t6, $s4, 58
+	bne $t6, $zero, zeroToNine
+	slti $t6, $s4, 89
+	bne $t6, $zero, AToX
+	slti $t6, $s4, 121
+	bne $t6, $zero, aTox
 
-    li $t5, 4
-    beq $t5, $s4, loop_exit
-    addi $s4, $s4, 1                            
-    addi $a0, $a0, -1                          
+	zeroToNine:
+	addi $s4, $s4, -48
+	j nextStep
+	AToX:
+	addi $s4, $s4, -55
+	j nextStep
+	aTox:
+	addi $s4, $s4, -87
 
-    lb $t2, 0($a0)                              
-    beqz $t2, loop                              
+	nextStep:
+	beq $s0, $s3, threePower
+	beq $s0, $s2, twoPower
+	beq $s0, $s1, onePower
+	beq $s0, $s5, zeroPower
 
-    li $a1, 10                                  
-    beq $a1, $t2, loop
+	threePower:
+	li $s6, 39304
+	mult $s4, $s6
+	mflo $s7
+	add $t7, $t7, $s7
+	addi $s0, $s0, -1
+	addi $a0, $a0, 1
+	j convertString
 
-    li $s7, 32                                  
-    beq $t2, $s7, handle_space  #this is if there is a space and how to handle it    
+	twoPower:
+	li $s6, 1156
+	mult $s4, $s6
+	mflo $s7
+	add $t7, $t7, $s7
+	addi $s0, $s0, -1
+	addi $a0, $a0, 1
+	j convertString
 
-    li $s6, 1
+	onePower:
+	li $s6, 34
+	mult $s4, $s6
+	mflo $s7
+	add $t7, $t7, $s7
+	addi $s0, $s0, -1
+	addi $a0, $a0, 1
+	j convertString
 
-    li $t0, 47
-    slt $t1, $t0, $t2
-    slti $t4, $t2, 58
-    and $s5, $t1, $t4                           
-    addi $s3, $t2, -48                          
-    li $t7, 1
-    beq $t7, $s5, calculation
+	zeroPower:
+	li $s6, 1
+	mult $s4, $s6
+	mflo $s7
+	add $t7, $t7, $s7
 
-    li $t0, 64
-    slt $t1, $t0, $t2
-    slti $t4, $t2, 91
-    and $s5, $t1, $t4                           
-    addi $s3, $t2, -55                          
-    li $t7, 1
-    beq $t7, $s5, calculation     
+	displaySum:
+	li $v0, 1
+	move $a0, $t7
+	syscall
 
-    li $t0, 96
-    slt $t1, $t0, $t2
-    slti $t4, $t2, 123
-    and $s5, $t1, $t4                          
-    addi $s3, $t2, -87                          
-    li $t7, 1
-    beq $t7, $s5, calculation                  
-
-    beq $s5, $zero, print_invalid_value         
-
-    calculation:
-    mult $s0, $s3                               
-    mflo $t3
-    add $s1, $s1, $t3                           
-
-    li $t6, 36
-    mult $s0, $t6
-    mflo $s0
-
-
-    jal loop
-    #restarting the if loop finding invalid values
-   	handle_space:
-    beq $zero, $s6, loop                        
-    jal print_invalid_value                     
-
-    
-    loop_exit:
-    li $v0, 1                                   
-    add $a0, $zero, $s1                         
-    syscall
-    jal exit
-
-    print_empty:
-    la $a0, input_is_empty                       
-    li $v0, 4                                   
-    syscall
-    jal exit
-
-    print_invalid_value:
-    la $a0, invalid_number                      
-    li $v0, 4                                   
-    syscall
-    jal exit
-
-    print_more_than_four:
-    la $a0, input_too_long                      
-    li $v0, 4                                   
-    syscall
-
-    exit:
-    li $v0, 10                                  
-    syscall
+	exit:
+	li $v0, 10
+	syscall
