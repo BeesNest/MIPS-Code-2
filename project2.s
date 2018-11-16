@@ -70,7 +70,7 @@ main:
     beq $a1, $t2, loop
 
     li $s7, 32                                  
-    beq $t2, $s7, handle_space     
+    beq $t2, $s7, handle_space  #this is if there is a space and how to handle it    
 
     li $s6, 1
 
