@@ -111,7 +111,7 @@ main:
 
 
     jal loop
-
+    #restarting the if loop finding invalid values
    	handle_space:
     beq $zero, $s6, loop                        
     jal print_invalid_value                     
