@@ -1,5 +1,5 @@
 .data
-	#this is where e define nothing 
+	#this is where define everuthing
     input_too_long:
     .asciiz "Input is too long."
     input_is_empty:
