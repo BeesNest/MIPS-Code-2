@@ -23,7 +23,7 @@ main:
     li $t1, 10                                  
     li $t2, 32
 
-    filter_loop:
+    filter_loop:  #this is the begining of the if statment and where we getn
     lb $t0, 0($a0)                              
     beq $t0, $t1, exit_filter_loop              
     beq $t0, $t2, skip                          
