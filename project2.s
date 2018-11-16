@@ -11,7 +11,7 @@
     filtered_input:                             
     .space 4
 
-.text
+.text 	#this is where we define the main and start dealing with logic 
 main:
 
     la $a0, input_storage                       
